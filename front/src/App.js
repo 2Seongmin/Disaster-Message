@@ -4,6 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import Header from "./components/common/Header/Header";
 import SignIn from "./pages/SignIn/SignIn";
 import SignUp from "./pages/SignUp/SignUp";
+import MesMain from "./pages/Messages/MesMain";
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
       {/* 라우터 */}
       <Routes>
         <Route path="/" />
-        <Route path="/messages" />
+        <Route path="/messages" element={<MesMain />} />
         <Route path="/shelters" />
         <Route path="/signIn" element={<SignIn />} />
         <Route path="/signUp" element={<SignUp />} />
