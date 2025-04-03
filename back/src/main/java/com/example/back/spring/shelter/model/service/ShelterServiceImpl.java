@@ -1,8 +1,5 @@
-package com.example.back.spring.message.model.service;
+package com.example.back.spring.shelter.model.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -10,14 +7,11 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class MessageServiceImpl implements MessageService {
+public class ShelterServiceImpl implements ShelterService {
 
     private final String SERVICE_KEY = "Z01DPH8K8834K5VC";
 
-    /* 긴급 재난 문자 api 리스트 가져오기 */
+    /* 통합 대피소 api 리스트 가져오기 */
     private String apiRequest(String uriPath){
         URI uri = null;
         try {
@@ -50,13 +44,5 @@ public class MessageServiceImpl implements MessageService {
 
         return apiRequest(sb.toString());
     }
-
-    // 카테고리 분류
-
-    /* 지역별 조회 (rgnNm) */
-
-
-    /* 재해구분명 (DST_SE_NM) */
-
-
+    
 }

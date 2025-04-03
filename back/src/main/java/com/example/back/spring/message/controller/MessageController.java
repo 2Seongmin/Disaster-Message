@@ -11,20 +11,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("busans")
+@RequestMapping("/message")
 @RequiredArgsConstructor
 public class MessageController {
 
     private final MessageService messageService;
 
     @GetMapping
-    public ResponseEntity<String> getBusanFoods(@RequestParam(name = "pageNo", defaultValue = "1") int pageNo) {
-
+    public ResponseEntity<String> requestMessages(@RequestParam(name = "pageNo", defaultValue = "1") int pageNo) {
 
         String responseData = messageService.requestMessages(pageNo);
 
+        log.info(responseData);
         return ResponseEntity.ok(responseData);
     }
+
+
 }
 
 
