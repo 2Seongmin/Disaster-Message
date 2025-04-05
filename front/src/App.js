@@ -5,6 +5,7 @@ import Header from "./components/common/Header/Header";
 import SignIn from "./pages/SignIn/SignIn";
 import SignUp from "./pages/SignUp/SignUp";
 import MesMain from "./pages/Messages/MesMain";
+import MesDetail from "./pages/Messages/MesDetail";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/shelters" />
         <Route path="/signIn" element={<SignIn />} />
         <Route path="/signUp" element={<SignUp />} />
+        <Route path="/messageDetail/:id" element={<MesDetail />} />
       </Routes>
     </>
   );

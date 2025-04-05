@@ -28,7 +28,7 @@ const HeaderLayout = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 1440px;
+  width: 1340px;
   height: 113px;
   background: #b4e2ff;
   padding: 0 50px;
