@@ -4,20 +4,20 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 
 const MessageDetail = () => {
-  const { id } = useParams();
-  const [message, setMessage] = useState([]);
+  const { sn } = useParams();
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8080/message/${id}`)
+      .get(`http://localhost:8080/message/${sn}`)
       .then((response) => {
-        console.log("받은 메시지 목록:", response.data.body);
-        setMessage(response.data.body); // List<MessageDTO> 형식이면 이대로 OK
+        console.log("받은 메시지 목록:", response.data);
+        setMessage(response.data);
       })
       .catch((error) => {
         console.error("메시지 조회 실패", error);
       });
-  }, [id]);
+  }, [sn]);
 
   if (!message) {
     return <h1>메시지 조회 중입니다.</h1>;
@@ -56,6 +56,10 @@ const MessageContainer = styled.div`
   border-radius: 16px;
   border: 2px solid #269af9;
   padding: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 `;
 
 const MessageNmContainer = styled.div`
@@ -63,7 +67,7 @@ const MessageNmContainer = styled.div`
   border-radius: 50px;
   background: #b4e2ff;
   height: 70px;
-  width: auto;
+  width: fit-content;
   align-items: center;
   padding: 0 30px;
   margin: 60px;
@@ -75,14 +79,22 @@ const MessageRgnNm = styled.span`
 
 const MessageStepNm = styled.span`
   font-size: 30px;
-  padding: 20px;
 `;
 
 const MessageContent = styled.div`
-  margin: 90px 70px;
+  margin: 40px 70px;
   font-size: 30px;
+  background-color: #ffe880;
+  padding: 20px;
+  border-radius: 16px;
 `;
 
 const MessageDate = styled.div`
-  font-size: 30px;
+  position: absolute;
+  bottom: 100px;
+  right: 100px;
+  font-size: 24px;
+  font-style: italic;
+  color: #888;
+  opacity: 0.8;
 `;

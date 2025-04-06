@@ -1,10 +1,17 @@
 import React from "react";
 import styled from "styled-components";
 import LogoSrc from "../../../assets/img/MessageLogo.png";
-
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 const Header = () => {
   const navi = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem("loginUser");
+    setIsLogin(!user);
+  }, []);
 
   return (
     <HeaderLayout>
@@ -15,8 +22,26 @@ const Header = () => {
       <HeaderRight>
         <NavList onClick={() => navi("/messages")}>긴급 재난 문자</NavList>
         <NavList onClick={() => navi("/shelters")}>통합 대피소</NavList>
-        <NavList onClick={() => navi("/signIn")}>로그인</NavList>
-        <NavList onClick={() => navi("/signUp")}>회원가입</NavList>
+        {isLogin ? (
+          <>
+            <NavList onClick={() => navi("/mypage")}>마이페이지</NavList>
+            <NavList
+              onClick={() => {
+                localStorage.removeItem("loginUser");
+                setIsLogin(false);
+                navi("/");
+                alert("로그아웃 되었습니다.");
+              }}
+            >
+              로그아웃
+            </NavList>
+          </>
+        ) : (
+          <>
+            <NavList onClick={() => navi("/signIn")}>로그인</NavList>
+            <NavList onClick={() => navi("/signUp")}>회원가입</NavList>
+          </>
+        )}
       </HeaderRight>
     </HeaderLayout>
   );

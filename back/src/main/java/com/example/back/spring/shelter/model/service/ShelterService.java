@@ -4,4 +4,5 @@ public interface ShelterService {
 
     String allShleters(int pageNo);
 
+    String shelterDetail(String sn);
 }

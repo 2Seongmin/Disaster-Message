@@ -8,6 +8,8 @@ import java.util.Map;
 public interface MessageService {
     String allMessages(int pageNo);
 
-    String getMessageById(String sn);
+    String messageDetail(int sn);
+
+    String findByRegion(String region, int page);
 
 }

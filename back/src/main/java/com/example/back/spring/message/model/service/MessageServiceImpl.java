@@ -1,6 +1,7 @@
 package com.example.back.spring.message.model.service;
 
-import com.example.back.spring.message.model.dto.MessageDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,27 +22,24 @@ public class MessageServiceImpl implements MessageService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    /* 긴급 재난 문자 API 요청 */
+    // API 요청
     private String apiRequest(String uriPath) {
         try {
             URI uri = new URI(uriPath);
             return restTemplate.getForObject(uri, String.class);
         } catch (URISyntaxException e) {
             log.error("URI syntax error: {}", uriPath, e);
-            return "{}";  // 빈 JSON 반환
+            return "{}";
         } catch (Exception e) {
             log.error("API request failed: {}", uriPath, e);
-            return "{}";  // 빈 JSON 반환
+            return "{}";
         }
     }
 
-    /* API URL 생성 */
+    // API URL 생성
     private String messageApiUrl(int pageNo) {
         String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-
-        if (pageNo < 1) {
-            pageNo = 1;
-        }
+        if (pageNo < 1) pageNo = 1;
 
         return "https://www.safetydata.go.kr/V2/api/DSSP-IF-00247"
                 + "?serviceKey=" + SERVICE_KEY
@@ -58,38 +55,71 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /* 세부 메시지 조회 */
-    private String messageDetailUrl() {
-        return "https://www.safetydata.go.kr/V2/api/DSSP-IF-00247"
-                + "?serviceKey=" + SERVICE_KEY;
+    @Override
+    public String messageDetail(int sn) {
+        int page = 1;
+        while (true) {
+            String response = apiRequest(messageApiUrl(page));
+
+            try {
+                // log.info("Searching page {}...", page);
+                Map<String, Object> map = mapper.readValue(response, Map.class);
+                List<Map<String, Object>> items = (List<Map<String, Object>>) map.get("body");
+
+                if (items == null || items.isEmpty()) break;
+
+                for (Map<String, Object> item : items) {
+                    if (((Number) item.get("SN")).intValue() == sn) {
+                        return mapper.writeValueAsString(item);
+                    }
+                }
+                page++;
+            } catch (Exception e) {
+                log.error("Parsing error on page {}", page, e);
+                break;
+            }
+        }
+        return "{}";
     }
 
+    /* 지역별로 찾기 */
     @Override
-    public String getMessageById(String sn) {
-        String responseJson = apiRequest(messageApiUrl(1));  // 필요시 페이지 반복 가능
+    public String findByRegion(String region, int page) {
+        int apiPage = 1;
+        List<Map<String, Object>> messageList = new ArrayList<>();
 
-        try {
-            // 전체 JSON을 Map으로 변환
-            Map<String, Object> jsonMap = mapper.readValue(responseJson, Map.class);
+        while (true) {
+            String response = apiRequest(messageApiUrl(apiPage));
 
-            // 구조를 따라 내려가기
-            Map<String, Object> response = (Map<String, Object>) jsonMap.get("response");
-            Map<String, Object> body = (Map<String, Object>) response.get("body");
-            List<Map<String, Object>> items = (List<Map<String, Object>>) body.get("items");
+            try {
+                // log.info("Searching page {}...", page);
+                Map<String, Object> map = mapper.readValue(response, Map.class);
+                List<Map<String, Object>> items = (List<Map<String, Object>>) map.get("body");
 
-            // SN 필터링
-            for (Map<String, Object> item : items) {
-                String itemSn = String.valueOf(item.get("SN"));  // 숫자라서 String 변환 필요
-                if (itemSn.equals(sn)) {
-                    return mapper.writeValueAsString(item);  // 해당 item을 다시 JSON 문자열로
+                if (items == null || items.isEmpty()) break;
+
+                for (Map<String, Object> item : items) {
+                    String searchRegion = (String) item.get("RCPTN_RGN_NM");
+                    if (searchRegion != null && searchRegion.contains(region)) {
+                        messageList.add(item);
+                    }
                 }
+                apiPage++;
+            } catch (Exception e) {
+                log.error("Parsing error on page {}", apiPage, e);
+                break;
             }
-
-        } catch (Exception e) {
-            log.error("Map 파싱 또는 필터링 오류", e);
         }
 
-        return "{}";  // 못 찾으면 빈 JSON 반환
-    }
+        int start = (page - 1) * 5;
+        int end = Math.min(start + 5, messageList.size());
+        List<Map<String, Object>> resultList = messageList.subList(start, end);
 
+        try {
+            return mapper.writeValueAsString(resultList);
+        } catch (Exception e) {
+            return "[]";
+        }
+    }
 
 }

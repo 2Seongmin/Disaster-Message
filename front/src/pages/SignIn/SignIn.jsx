@@ -1,6 +1,27 @@
 import styled from "styled-components";
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
+  const [memberId, setMemberId] = useState("");
+  const [memberPw, setMemberPw] = useState("");
+  const navi = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      await axios.post("http://localhost:8080/login", {
+        memberId,
+        memberPw,
+      });
+      alert("로그인 성공!");
+      navi("/");
+      window.location.reload();
+    } catch (error) {
+      alert("로그인 실패");
+    }
+  };
+
   return (
     <>
       <LoginLayout>
@@ -10,9 +31,19 @@ const SignIn = () => {
         </LoginTop>
 
         <LoginContainer>
-          <LoginId></LoginId>
-          <LoginPw></LoginPw>
-          <LoginButton>시작하기</LoginButton>
+          <LoginId
+            type="text"
+            placeholder="아이디"
+            value={memberId}
+            onChange={(e) => setMemberId(e.target.value)}
+          ></LoginId>
+          <LoginPw
+            type="text"
+            placeholder="비밀번호"
+            value={memberPw}
+            onChange={(e) => setMemberPw(e.target.value)}
+          ></LoginPw>
+          <LoginButton onClick={handleLogin}>시작하기</LoginButton>
         </LoginContainer>
       </LoginLayout>
     </>

@@ -1,16 +1,12 @@
 package com.example.back.spring.message.controller;
 
-import com.example.back.spring.message.model.dto.MessageDTO;
 import com.example.back.spring.message.model.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.message.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -26,16 +22,23 @@ public class MessageController {
         return messageService.allMessages(pageNo);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<String> getMessageById(@PathVariable("id") String sn) {
-        String messageJson = messageService.getMessageById(sn);
-        if (!messageJson.equals("{}")) {
-            return ResponseEntity.ok(messageJson);
-        } else {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/{sn}")
+    public ResponseEntity<String> getMessageBySn(@PathVariable int sn) {
+        String result = messageService.messageDetail(sn);
+
+        if (result.equals("{}")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("해당 SN을 가진 메시지를 찾을 수 없습니다.");
         }
+        return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/region")
+    public String findByRegion(@RequestParam String region,
+                                               @RequestParam(defaultValue = "1") int page) {
+
+        return messageService.findByRegion(region, page);
+    }
 
 
 }
