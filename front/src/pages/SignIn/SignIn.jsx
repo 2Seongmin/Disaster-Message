@@ -56,7 +56,7 @@ const LoginLayout = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 260px;
+  margin: 260px 0px 300px 0px;
 `;
 
 const LoginTop = styled.div``;

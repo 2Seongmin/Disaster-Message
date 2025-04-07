@@ -1,9 +1,8 @@
 package com.example.back.spring.message.model.service;
 
-import com.example.back.spring.message.model.dto.MessageDTO;
+import com.example.back.spring.message.model.dto.CommentDTO;
 
 import java.util.List;
-import java.util.Map;
 
 public interface MessageService {
     String allMessages(int pageNo);
@@ -11,5 +10,9 @@ public interface MessageService {
     String messageDetail(int sn);
 
     String findByRegion(String region, int page);
+
+    void saveComment(CommentDTO comment);
+
+    List<CommentDTO> selectCommentList(Long seq);
 
 }

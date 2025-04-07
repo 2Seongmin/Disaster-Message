@@ -1,7 +1,7 @@
 package com.example.back.spring.message.model.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.example.back.spring.message.model.dao.CommentMapper;
+import com.example.back.spring.message.model.dto.CommentDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class MessageServiceImpl implements MessageService {
 
     // API URL 생성
     private String messageApiUrl(int pageNo) {
-        String today = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
         if (pageNo < 1) pageNo = 1;
 
         return "https://www.safetydata.go.kr/V2/api/DSSP-IF-00247"
@@ -120,6 +120,21 @@ public class MessageServiceImpl implements MessageService {
         } catch (Exception e) {
             return "[]";
         }
+    }
+
+
+    /* 댓글 */
+    private final CommentMapper commentMapper;
+
+    @Override
+    public void saveComment(CommentDTO comment) {
+        commentMapper.saveComment(comment);
+
+    }
+
+    @Override
+    public List<CommentDTO> selectCommentList(Long seq) {
+        return commentMapper.selectCommentList(seq);
     }
 
 }

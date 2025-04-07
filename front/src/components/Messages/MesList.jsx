@@ -13,7 +13,7 @@ const MesList = () => {
       .get(`http://localhost:8080/message?pageNo=${pageNo}`)
       .then((response) => {
         console.log(response.data.body);
-        setMessages(response.data.body);
+        setMessages(response.data.body || []);
       })
       .catch((error) => {
         console.error("재난문자 가져오기 실패", error);

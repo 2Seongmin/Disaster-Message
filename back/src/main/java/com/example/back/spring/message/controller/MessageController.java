@@ -1,11 +1,14 @@
 package com.example.back.spring.message.controller;
 
+import com.example.back.spring.message.model.dto.CommentDTO;
 import com.example.back.spring.message.model.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @Slf4j
@@ -35,9 +38,22 @@ public class MessageController {
 
     @GetMapping("/region")
     public String findByRegion(@RequestParam String region,
-                                               @RequestParam(defaultValue = "1") int page) {
+                               @RequestParam(defaultValue = "1") int page) {
 
         return messageService.findByRegion(region, page);
+    }
+
+    @PostMapping("/comments")  // 식당번호, 내용 => 가공
+    public ResponseEntity<?> save(@RequestBody CommentDTO comment){
+        // log.info("{}", comment);
+        messageService.saveComment(comment);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/comments/{seq}")
+    public ResponseEntity<List<CommentDTO>> getComments(@PathVariable(name="seq") Long seq){
+        List<CommentDTO> comments = messageService.selectCommentList(seq);
+        return ResponseEntity.ok(comments);
     }
 
 
