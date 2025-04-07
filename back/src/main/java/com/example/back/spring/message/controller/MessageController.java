@@ -43,6 +43,11 @@ public class MessageController {
         return messageService.findByRegion(region, page);
     }
 
+    @GetMapping("/date")
+    public String dateMessages(@RequestParam(defaultValue = "1") int pageNo) {
+        return messageService.allMessages(pageNo);
+    }
+
     @PostMapping("/comments")  // 식당번호, 내용 => 가공
     public ResponseEntity<?> save(@RequestBody CommentDTO comment){
         // log.info("{}", comment);

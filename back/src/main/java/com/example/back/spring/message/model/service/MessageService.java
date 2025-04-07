@@ -11,6 +11,8 @@ public interface MessageService {
 
     String findByRegion(String region, int page);
 
+    String dateMessages(int pageNo);
+
     void saveComment(CommentDTO comment);
 
     List<CommentDTO> selectCommentList(Long seq);

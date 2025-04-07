@@ -18,7 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-    private final String SERVICE_KEY = "Z01DPH8K8834K5VC";
+    private final String SERVICE_KEY = "";
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -47,6 +47,19 @@ public class MessageServiceImpl implements MessageService {
                 + "&numOfRows=5"
                 + "&crtDt=" + today;
     }
+
+
+    private String messageDateApiUrl(int pageNo) {
+        String today = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        if (pageNo < 1) pageNo = 1;
+
+        return "https://www.safetydata.go.kr/V2/api/DSSP-IF-00247"
+                + "?serviceKey=" + SERVICE_KEY
+                + "&pageNo=" + pageNo
+                + "&numOfRows=5"
+                + "&crtDt=" + today;
+    }
+
 
     /* 전체 메시지 조회 */
     @Override
@@ -122,6 +135,10 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
+    @Override
+    public String dateMessages(int pageNo) {
+        return apiRequest(messageDateApiUrl(pageNo));
+    }
 
     /* 댓글 */
     private final CommentMapper commentMapper;

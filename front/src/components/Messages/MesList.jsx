@@ -7,28 +7,84 @@ const MesList = () => {
   const navi = useNavigate();
   const [pageNo, setPageNo] = useState(1);
   const [messages, setMessages] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [region, setRegion] = useState("");
+  const [showRegionInput, setShowRegionInput] = useState(false);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8080/message?pageNo=${pageNo}`)
-      .then((response) => {
-        console.log(response.data.body);
-        setMessages(response.data.body || []);
-      })
-      .catch((error) => {
-        console.error("재난문자 가져오기 실패", error);
-      });
-  }, [pageNo]);
+    if (selectedCategory === "전체") {
+      axios
+        .get(`http://localhost:8080/message?pageNo=${pageNo}`)
+        .then((res) => setMessages(res.data.body || []))
+        .catch((err) => console.error("전체 메시지 가져오기 실패", err));
+    } else if (selectedCategory === "날짜별") {
+      axios
+        .get(`http://localhost:8080/message/date?pageNo=${pageNo}`)
+        .then((res) => setMessages(res.data.body || []))
+        .catch((err) => console.error("날짜별 메시지 가져오기 실패", err));
+    } else if (selectedCategory === "지역별" && region !== "") {
+      axios
+        .get(
+          `http://localhost:8080/message/region?region=${region}&page=${pageNo}`
+        )
+        .then((res) => setMessages(res.data.body || []))
+        .catch((err) => console.error("지역별 메시지 가져오기 실패", err));
+    }
+  }, [pageNo, selectedCategory, region]);
+
+  const handleRegionSearch = () => {
+    if (region.trim() !== "") {
+      setPageNo(1); // 검색할 땐 첫 페이지부터
+    }
+  };
 
   return (
     <ListSection>
       <ListTitle>긴급 재난 문자</ListTitle>
 
       <CategoryList>
-        <Category>전체</Category>
-        <Category>지역별</Category>
-        <Category>날짜별</Category>
+        <Category
+          onClick={() => {
+            setSelectedCategory("전체");
+            setPageNo(1);
+            setShowRegionInput(false);
+          }}
+        >
+          전체
+        </Category>
+        <Category
+          onClick={() => {
+            setSelectedCategory("지역별");
+            setMessages([]);
+            setRegion("");
+            setShowRegionInput(true);
+            setPageNo(1);
+          }}
+        >
+          지역별
+        </Category>
+        <Category
+          onClick={() => {
+            setSelectedCategory("날짜별");
+            setShowRegionInput(false);
+            setPageNo(1);
+          }}
+        >
+          날짜별
+        </Category>
       </CategoryList>
+
+      {showRegionInput && (
+        <SearchBox>
+          <input
+            type="text"
+            value={region}
+            placeholder="지역명을 입력하세요 (예: 서울)"
+            onChange={(e) => setRegion(e.target.value)}
+          />
+          <button onClick={handleRegionSearch}>검색</button>
+        </SearchBox>
+      )}
 
       <ListLayout>
         <ListTh>
@@ -178,5 +234,50 @@ const Pagination = styled.div`
     width: 40px;
     height: 40px;
     text-align: center;
+  }
+`;
+
+const SearchBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px auto;
+  padding: 12px 20px;
+  background-color: #f4f9ff;
+  border: 1px solid #cce6ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+  width: 600px;
+  max-width: 90%;
+  gap: 10px;
+
+  input {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 16px;
+    border: 1px solid #b3d7ff;
+    border-radius: 8px;
+    outline: none;
+    background-color: white;
+    transition: border-color 0.3s ease;
+
+    &:focus {
+      border-color: #007bff;
+    }
+  }
+
+  button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #0056b3;
+    }
   }
 `;
